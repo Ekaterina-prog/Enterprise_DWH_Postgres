@@ -2,193 +2,230 @@
 -- Реализована полная перезапись данных (full reload)
 
 create or replace procedure staging.film_load()
-as $$
+ as $$
 	begin
-	    delete from staging.film;
-	
-	    insert into staging.film 
-		(
-	        film_id, 
-			title, 	
-			description,
-			release_year,
-			language_id,
-	        rental_duration,
-			rental_rate,
-			length,
-			replacement_cost,
-	        rating,
-			last_update,
-			special_features,
-			fulltext
-	    )
-	    select
-	        film_id,
+		delete from staging.film;
+
+		insert
+		into
+		staging.film
+			(film_id,
 			title,
 			description,
 			release_year,
 			language_id,
-	        rental_duration,
+			rental_duration,
 			rental_rate,
 			length,
 			replacement_cost,
-	        rating,
+			rating,
+			last_update,
+			special_features,
+			fulltext)
+		select 
+			film_id,
+			title,
+			description,
+			release_year,
+			language_id,
+			rental_duration,
+			rental_rate,
+			length,
+			replacement_cost,
+			rating,
 			last_update,
 			special_features,
 			fulltext
-	    from 
+		from
 			film_src.film;
 	end;
 $$ language plpgsql;
 
 create or replace procedure staging.inventory_load()
 as $$
+	declare 
+		last_update_dt timestamp;
 	begin
-	    delete from staging.inventory;
-	
-	    insert into staging.inventory 
+		last_update_dt = coalesce( 
+			(
+				select
+					max(update_dt)
+				from
+					staging.last_update
+				where 
+					table_name = 'staging.inventory'
+			),
+			'1900-01-01'::date	
+		);
+		
+		delete from staging.inventory;
+
+		insert into staging.inventory
 		(
 			inventory_id, 
 			film_id, 
-			store_id
+			store_id,
+			last_update,
+			deleted
+			
 		)
-	    select 
+		select 
 			inventory_id, 
 			film_id, 
-			store_id
-	    from 
-			film_src.inventory;
+			store_id,
+			last_update,
+			deleted
+		from
+			film_src.inventory i
+		where 
+			i.last_update >= last_update_dt
+			or i.deleted >= last_update_dt;
+		
+		INSERT INTO staging.last_update
+		(
+			table_name, 
+			update_dt
+		)
+		VALUES(
+			'staging.inventory', 
+			now()
+		);
+
 	end;
 $$ language plpgsql;
 
 create or replace procedure staging.rental_load()
 as $$
 	begin
-	    delete from staging.rental;
-	
-	    insert into staging.rental 
+		delete from staging.rental;
+
+		insert into staging.rental
 		(
-	        rental_id,
-			rental_date,
-			inventory_id,
-			customer_id,
-			return_date,
+			rental_id, 
+			rental_date, 
+			inventory_id, 
+			customer_id, 
+			return_date, 
 			staff_id
-	    )
-	    select 
-			rental_id,
-			rental_date,
-			inventory_id,
-			customer_id,
-			return_date,
+		)
+		select 
+			rental_id, 
+			rental_date, 
+			inventory_id, 
+			customer_id, 
+			return_date, 
 			staff_id
-	    from 
+		from
 			film_src.rental;
 	end;
+
 $$ language plpgsql;
 
 create or replace procedure staging.payment_load()
 as $$
 	begin
-	    delete from staging.payment;
-	
-	    insert into staging.payment 
+		delete from staging.payment;
+
+		insert into staging.payment
 		(
-			payment_id,
-			customer_id,
-			staff_id,
-			rental_id,
-			amount,
-			paymentdate
-	    )
-	    select 
-			payment_id,
-			customer_id,
-			staff_id,
-			rental_id,
-			amount,
-			paymentdate
-	    from 
+			payment_id, 
+			customer_id, 
+			staff_id, 
+			rental_id, 
+			amount, 
+			payment_date
+		)
+		select
+			payment_id, 
+			customer_id, 
+			staff_id, 
+			rental_id, 
+			amount, 
+			payment_date
+		from
 			film_src.payment;
 	end;
 $$ language plpgsql;
 
 create or replace procedure staging.staff_load()
 as $$
-	begin
-	    delete from staging.staff;
+	begin 
+		delete from staging.staff;
 	
-	    insert into staging.staff 
+		insert into staging.staff
 		(
-			staff_id, 
-			first_name, 
-			last_name, 
-			store_id
-		)
-	    select 
 			staff_id,
 			first_name,
 			last_name,
 			store_id
-	    from 
-			film_src.staff;
+		)
+		select
+			staff_id,
+			first_name,
+			last_name,
+			store_id 
+		from
+			film_src.staff s;
 	end;
 $$ language plpgsql;
 
+
 create or replace procedure staging.address_load()
 as $$
-	begin
-	    delete from staging.address;
+	begin 
+		delete from staging.address;
 	
-	    insert into staging.address 
+		insert into staging.address
 		(
-			address_id, 
-			address, 
-			district, 
+			address_id,
+			address,
+			district,
 			city_id
 		)
-	    select 
-				address_id, 
-				address, 
-				district, 
-				city_id
-	    from 
+		select
+			address_id,
+			address,
+			district,
+			city_id
+		from 
 			film_src.address;
 	end;
 $$ language plpgsql;
 
 create or replace procedure staging.city_load()
 as $$
-	begin
-	    delete from staging.city;
+	begin 
+		delete from staging.city;
 	
-	    insert into staging.city 
+		insert into staging.city
 		(
-			city_id, 
+			city_id,
 			city
 		)
-	    select 
-			city_id, 
+		select
+			city_id,
 			city
-	    from 
+		from
 			film_src.city;
+
 	end;
 $$ language plpgsql;
 
 create or replace procedure staging.store_load()
 as $$
-	begin
-	    delete from staging.store;
+	begin 
+		delete from staging.store;
 	
-	    insert into staging.store 
+		insert into staging.store
 		(
-			store_id, 
+			store_id,
 			address_id
 		)
-	    select 
-			store_id, 
+		select
+			store_id,
 			address_id
-	    from 
+		from
 			film_src.store;
+
 	end;
 $$ language plpgsql;

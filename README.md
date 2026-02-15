@@ -1,69 +1,95 @@
-# Data Warehouse Implementation (Kimball) — PostgreSQL
+Архитектура
 
-## Project Overview
+1. Source Layer
+   PostgreSQL база dvdrental
+   Подключение через postgres_fdw
+   Данные импортированы в схему film_src
 
-This project demonstrates a practical implementation of a Data Warehouse using the Kimball methodology in PostgreSQL.
+2. Staging Layer
+   Схема: staging
+   Назначение:
+   промежуточное хранение данных
+   минимальная обработка
+   подготовка к загрузке в core слой
 
-The goal is to design and build a layered DWH architecture starting from source system integration up to analytical data marts.
+Особенности:
+Полная загрузка для большинства таблиц
+Инкрементальная загрузка для inventory
+Поддержка soft delete (поле deleted)
+Контроль загрузки через таблицу staging.last_update
 
-Source system: `dvdrental` (PostgreSQL sample dataset).
+Реализованные таблицы:
+film
+inventory
+rental
+payment
+staff
+address
+city
+store
 
----
+Staging слой не содержит бизнес-логики и surrogate keys.
 
-## Architecture
+3. Core Layer (Star Schema)
+   Реализована звездная схема по методологии Kimball.
 
-### 1. Source Layer
+Схема: core
 
-- PostgreSQL database: `dvdrental`
-- Integration method: `postgres_fdw`
-- Foreign tables imported into a dedicated schema
+Измерения (Dimensions)
+dim_date
+Календарное измерение, генерируется процедурой core.load_date.
+Содержит:
+день, месяц, квартал, год
+week_of_year, ISO week
+first/last day of period
+признак выходного дня
+dim_inventory
 
-### 2. Staging Layer
+Измерение с реализацией Slowly Changing Dimension Type 2.
 
-- Separate PostgreSQL database for DWH
-- Schema: `staging`
-- Full reload strategy
-- Data loading implemented via PL/pgSQL stored procedures
+Поддерживает историзацию через:
+effective_date_from
+effective_date_to
+is_active
 
-Implemented staging tables:
+При изменении записи создаётся новая версия строки с сохранением истории.
+dim_staff
 
-- film
-- inventory
-- rental
-- payment
+Измерение сотрудников.
+Реализована стратегия полной перезагрузки.
 
-### 3. Core Layer (In Progress)
+Факты (Facts)
+fact_payment
+Факт платежей:
+сумма оплаты
+связь с датой оплаты
+связь с сотрудником
+связь с инвентарём
 
-- Star schema (fact + dimensions)
-- Dimensional modeling according to Kimball
-- Planned implementation of Slowly Changing Dimensions (SCD Type 2)
+fact_rental
+Факт аренды:
+количество операций
+сумма
+дата аренды
+дата возврата
+Фактовые таблицы используют surrogate keys измерений.
 
-### 4. Datamarts (Planned)
+4. Data Mart Layer
 
-- Analytical views for reporting
+Схема: report
 
----
+Реализованы агрегированные витрины:
+report.sales_date — продажи по датам
+report.sales_film — продажи по фильмам
 
-## Technologies Used
+Процедуры:
+report.sales_date_calc()
+report.sales_film_calc()
 
-- PostgreSQL
-- PL/pgSQL
-- postgres_fdw
-- Git
+Стратегия загрузки
 
----
-
-## Current Status
-
-- Source connection configured via postgres_fdw
-- Staging layer implemented with full reload procedures
-- Core layer design in progress
-
----
-
-## How to Run
-
-1. Clone repository:
-   ```bash
-   git clone https://github.com/Ekaterina-prog/DWH_Kimball_Postgres.git
-   ```
+Используется гибридная стратегия:
+Инкрементальная загрузка для staging.inventory
+SCD Type 2 для core.dim_inventory
+Полная перезагрузка для фактов
+Генерация календаря через отдельную процедуру

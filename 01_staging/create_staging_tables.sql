@@ -3,6 +3,7 @@
 
 create schema if not exists staging;
 
+drop table if exists staging.last_update;
 drop table if exists staging.film;
 drop table if exists staging.inventory;
 drop table if exists staging.rental;
@@ -11,6 +12,11 @@ drop table if exists staging.staff;
 drop table if exists staging.address;
 drop table if exists staging.city;
 drop table if exists staging.store;
+
+create table staging.last_update (
+	table_name varchar(50) not null,
+	update_dt timestamp not null
+);
 
 create table staging.film (
     film_id int not null,
@@ -29,9 +35,11 @@ create table staging.film (
 );
 
 create table staging.inventory (
-    inventory_id int4 not null,
-    film_id int2 not null,
-    store_id int2 not null
+	inventory_id int4 not null,
+	film_id int2 not null,
+	store_id int2 not null,
+	last_update timestamp not null,
+	deleted timestamp null
 );
 
 create table staging.rental (
