@@ -3,7 +3,10 @@
 
 create or replace procedure staging.film_load()
  as $$
+	declare 
+			current_update_dt timestamp = now();
 	begin
+		
 		delete from staging.film;
 
 		insert
@@ -38,6 +41,17 @@ create or replace procedure staging.film_load()
 			fulltext
 		from
 			film_src.film;
+
+		insert into staging.last_update
+		(
+			table_name, 
+			update_dt
+		)
+		values
+		(
+			'staging.film', 
+			current_update_dt
+		);
 	end;
 $$ language plpgsql;
 
