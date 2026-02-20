@@ -276,3 +276,8 @@ Inmon:
 - Centralized historical storage (DDS)
 - Data marts built on top of integrated warehouse
 The project demonstrates practical implementation of both approaches within PostgreSQL and highlights architectural trade-offs.
+
+11. Inmon Data Mart Layer
+
+A reporting layer (06_report) is implemented on top of the DDS layer.
+It includes a calendar dimension and a sales_by_date data mart with a dedicated function returning formatted sales results for visualization.

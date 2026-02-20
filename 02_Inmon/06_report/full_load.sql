@@ -49,7 +49,10 @@ as $$
 		call dds.staff_load();
 		call dds.store_load();
 		call dds.payment_load();
+	
+		call report.sales_by_date_calc();
 	end;
 $$ language plpgsql;
 
+call report.fill_calendar('2007-01-01'::date, 7304);
 call full_load();
