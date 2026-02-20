@@ -193,7 +193,7 @@ Conceptual examples:
 - Ratios and percentages → non-additive
 The project demonstrates understanding of different fact behaviors and their architectural implications.
 
-Further Learning: Inmon Architecture (In Progress)
+9. Further Learning: Inmon Architecture (In Progress)
 After completing the Kimball implementation, the project continues with the Inmon enterprise data warehouse approach.
 
 Currently Implemented
@@ -208,15 +208,71 @@ Planned Next
 - Data marts built on top of DDS
 - Architectural comparison: Kimball vs Inmon
 
+10. Inmon Architecture (Enterprise DWH Approach)
+In addition to the Kimball dimensional model, the repository implements the Inmon enterprise architecture.
 
+Implemented Layers
 
+Staging
+Raw data ingestion from source (PostgreSQL dvdrental).
 
+ODS (Operational Data Store)
+Current-state operational layer with incremental logic and technical fields (last_update, deleted).
 
+REF
+Surrogate key mapping layer.
+Natural keys are mapped to enterprise surrogate identifiers.
 
+Integration Layer (3NF Transformation)
+Schema: integration
 
+Purpose:
+- Transform ODS data into enterprise 3NF structure
+- Replace natural keys with surrogate keys
+- Prepare data for historical storage (DDS)
 
+Characteristics:
+- Based on ODS
+- Full reload for small reference tables (film, inventory)
+- Incremental processing for transactional tables (rental)
+- No date dimension at this stage (timestamps preserved)
+This layer represents the transformation from operational store to enterprise warehouse.
 
+DDS Layer (Historical Storage)
+Schema: dds
 
+Purpose:
+- Preserve historical state of reference data
+- Support time-based enterprise reporting
 
+Hitorical tracking is implemented for:
+- film
+- inventory
 
+Change detection is performed using row-level hashing:
+md5(row::text)
 
+If hash changes:
+- previous version is closed
+- new version is inserted
+
+Fields added:
+- date_effective_from
+- date_effective_to
+- is_active
+-hash
+Dates are not normalized here (unlike Kimball).
+Date dimensions are created later at the data mart level if required.
+
+Architectural Perspective
+
+Kimball:
+- Dimensional model first (Star Schema)
+- Reporting-oriented
+- Optimized for performance
+
+Inmon:
+- Enterprise 3NF warehouse first
+- Centralized historical storage (DDS)
+- Data marts built on top of integrated warehouse
+The project demonstrates practical implementation of both approaches within PostgreSQL and highlights architectural trade-offs.

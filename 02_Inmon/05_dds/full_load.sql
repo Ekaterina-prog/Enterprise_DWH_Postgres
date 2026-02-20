@@ -23,14 +23,32 @@ as $$
 		call ods.store_load();
 		call ods.payment_load();
 		
-		call film_id_sync();
-		call inventory_id_sync();
-		call rental_id_sync();
-		call address_id_sync();
-		call city_id_sync();
-		call staff_id_sync();
-		call store_id_sync();
-		call payment_id_sync();
+		call ref.film_id_sync();
+		call ref.inventory_id_sync();
+		call ref.rental_id_sync();
+		call ref.address_id_sync();
+		call ref.city_id_sync();
+		call ref.staff_id_sync();
+		call ref.store_id_sync();
+		call ref.payment_id_sync();
+	
+		call integ.film_load();
+		call integ.inventory_load();
+		call integ.rental_load();
+		call integ.address_load();
+		call integ.city_load();
+		call integ.staff_load();
+		call integ.store_load();
+		call integ.payment_load();
+	
+		call dds.film_load();
+		call dds.inventory_load();
+		call dds.rental_load();
+		call dds.address_load();
+		call dds.city_load();
+		call dds.staff_load();
+		call dds.store_load();
+		call dds.payment_load();
 	end;
 $$ language plpgsql;
 

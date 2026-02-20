@@ -1,9 +1,9 @@
---создание таблиц dds слоя
+--создание таблиц integration слоя
 
-create schema dds;
+create schema integ;
 
-drop table if exists dds.film;
-CREATE TABLE dds.film (
+drop table if exists integ.film;
+CREATE TABLE integ.film (
 	film_id int NOT NULL,
 	title varchar(255) NOT NULL,
 	description text NULL,
@@ -14,39 +14,35 @@ CREATE TABLE dds.film (
 	length int2 NULL,
 	replacement_cost numeric(5,2) NOT NULL,
 	rating mpaa_rating NULL,
+	last_update timestamp NOT NULL,
 	special_features _text NULL,
-	fulltext tsvector NOT null,
-	date_effective_from timestamp not null,
-	date_effective_to timestamp not null,
-	is_active boolean not null,
-	hash varchar(32)
+	fulltext tsvector NOT NULL
 );
 
-drop table if exists dds.inventory;
-CREATE TABLE dds.inventory (
+drop table if exists integ.inventory;
+CREATE TABLE integ.inventory (
 	inventory_id int NOT NULL,
 	film_id int2 NOT NULL,
 	store_id int2 NOT NULL,
-	date_effective_from timestamp not null,
-	date_effective_to timestamp not null,
-	is_active boolean not null,
-	hash varchar(32)
+	last_update timestamp NOT NULL,
+	deleted timestamp NULL
 );
 
-drop table if exists dds.rental;
-CREATE TABLE dds.rental (
+drop table if exists integ.rental;
+CREATE TABLE integ.rental (
 	rental_id int NOT NULL,
 	rental_date timestamp NOT NULL,
 	inventory_id int4 NOT NULL,
 	return_date timestamp NULL,
 	staff_id int2 NOT NULL,
 	last_update timestamp NOT NULL,
-	deleted timestamp null
+	deleted timestamp NULL
 );
+ 
 
 
-drop table if exists dds.address;
-CREATE TABLE dds.address (
+drop table if exists integ.address;
+CREATE TABLE integ.address (
 	address_id int NOT NULL,
 	address varchar(50) NOT NULL,
 	address2 varchar(50) NULL,
@@ -54,24 +50,18 @@ CREATE TABLE dds.address (
 	city_id int2 NOT NULL,
 	postal_code varchar(10) NULL,
 	phone varchar(20) NOT NULL,
-	date_effective_from timestamp not null,
-	date_effective_to timestamp not null,
-	is_active boolean not null,
-	hash varchar(32)
+	last_update timestamp NOT NULL
 );
 
-drop table if exists dds.city;
-CREATE TABLE dds.city (
+drop table if exists integ.city;
+CREATE TABLE integ.city (
 	city_id int NOT NULL,
 	city varchar(50) NOT NULL,
-	date_effective_from timestamp not null,
-	date_effective_to timestamp not null,
-	is_active boolean not null,
-	hash varchar(32)
+	last_update timestamp NOT NULL
 );
 
-drop table if exists dds.staff;
-CREATE TABLE dds.staff (
+drop table if exists integ.staff;
+CREATE TABLE integ.staff (
 	staff_id int NOT NULL,
 	first_name varchar(45) NOT NULL,
 	last_name varchar(45) NOT NULL,
@@ -80,26 +70,21 @@ CREATE TABLE dds.staff (
 	store_id int2 NOT NULL,
 	active bool NOT NULL,
 	username varchar(16) NOT NULL,
+	last_update timestamp NOT NULL,
 	picture bytea NULL,
-	date_effective_from timestamp not null,
-	date_effective_to timestamp not null,
-	is_active boolean not null,
-	hash varchar(32)
+	deleted timestamp NULL
 );
 
-drop table if exists dds.store;
-CREATE TABLE dds.store (
+drop table if exists integ.store;
+CREATE TABLE integ.store (
 	store_id int NOT NULL,
 	manager_staff_id int2 NOT NULL,
 	address_id int2 NOT NULL,
-	date_effective_from timestamp not null,
-	date_effective_to timestamp not null,
-	is_active boolean not null,
-	hash varchar(32)
+	last_update timestamp NOT NULL
 );
 
-drop table if exists dds.payment;
-CREATE TABLE dds.payment (
+drop table if exists integ.payment;
+CREATE TABLE integ.payment (
 	payment_id int NOT NULL,
 	staff_id int2 NOT NULL,
 	rental_id int4 NOT NULL,
