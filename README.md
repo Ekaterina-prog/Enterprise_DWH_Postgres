@@ -281,3 +281,7 @@ The project demonstrates practical implementation of both approaches within Post
 
 A reporting layer (06_report) is implemented on top of the DDS layer.
 It includes a calendar dimension and a sales_by_date data mart with a dedicated function returning formatted sales results for visualization.
+
+12. Added data mart sales_film_by_date for BI visualization.
+Built Power BI dashboard with time filters, film filters and aggregated sales metrics.
+
