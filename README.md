@@ -295,3 +295,15 @@ Key features:
 - Incremental data loading approach
 - Historical data tracking (LoadDate / LoadEndDate)
 
+Technical implementation:
+- Added separate DWHDataVault database
+- Configured FDW connection to source system
+- Implemented staging layer (full + incremental load)
+- Created hubs, links and satellites
+- Implemented MD5 hash-based surrogate keys
+- Added full load orchestration script
+
+
+
+
+
