@@ -285,3 +285,13 @@ It includes a calendar dimension and a sales_by_date data mart with a dedicated 
 12. Added data mart sales_film_by_date for BI visualization.
 Built Power BI dashboard with time filters, film filters and aggregated sales metrics.
 
+13. Data Vault
+
+Implementation of a Raw Vault layer based on the Data Vault 2.0 methodology.
+
+Key features:
+- Hub, Link, and Satellite modeling pattern
+- Hash-based surrogate keys
+- Incremental data loading approach
+- Historical data tracking (LoadDate / LoadEndDate)
+
