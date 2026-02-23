@@ -286,7 +286,6 @@ It includes a calendar dimension and a sales_by_date data mart with a dedicated 
 Built Power BI dashboard with time filters, film filters and aggregated sales metrics.
 
 13. Data Vault
-
 Implementation of a Raw Vault layer based on the Data Vault 2.0 methodology.
 
 Key features:
@@ -302,6 +301,9 @@ Technical implementation:
 - Created hubs, links and satellites
 - Implemented MD5 hash-based surrogate keys
 - Added full load orchestration script
+
+14. Anchor Modeling
+Conceptual implementation of Anchor Modeling demonstrating anchors, attributes, ties and fully normalized (6NF) schema design with extensibility.
 
 
 
