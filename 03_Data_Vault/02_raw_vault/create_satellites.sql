@@ -1,10 +1,9 @@
 -- создаем саттелиты
 
-drop table if exists SatFilm;
-create table SatFilm (
-	HubFilmHashKey varchar(32) not null references HubFilm(HubFilmHashKey),
+create table dataVault.SatFilm (
+	HubFilmHashKey varchar(32) not null references dataVault.HubFilm(HubFilmHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	HashDiff varchar(32) not null,
 	
@@ -17,11 +16,10 @@ create table SatFilm (
 	PRIMARY KEY (HubFilmHashKey, LoadDate)
 );
 
-drop table if exists SatFilmMon;
-create table SatFilmMon (
-	HubFilmHashKey varchar(32) not null references HubFilm(HubFilmHashKey),
+create table dataVault.SatFilmMon (
+	HubFilmHashKey varchar(32) not null references dataVault.HubFilm(HubFilmHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	HashDiff varchar(32) not null,
 	
@@ -32,41 +30,37 @@ create table SatFilmMon (
 	PRIMARY KEY (HubFilmHashKey, LoadDate)
 );
 
-drop table if exists SatFilmInventory;
-create table SatFilmInventory (
-	LinkFilmInventoryHashKey varchar(32) not null references LinkFilmInventory(LinkFilmInventoryHashKey),
+create table dataVault.SatFilmInventory (
+	LinkFilmInventoryHashKey varchar(32) not null references dataVault.LinkFilmInventory(LinkFilmInventoryHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	
 	PRIMARY KEY (LinkFilmInventoryHashKey, LoadDate)
 );
 
-drop table if exists SatInventory;
-create table SatInventory (
-	HubInventoryHashKey varchar(32) not null references HubInventory(HubInventoryHashKey),
+create table dataVault.SatInventory (
+	HubInventoryHashKey varchar(32) not null references dataVault.HubInventory(HubInventoryHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	
 	PRIMARY KEY (HubInventoryHashKey, LoadDate)
 );
 
-drop table if exists SatRentalInventory;
-create table SatRentalInventory (
-	LinkRentalInventoryHashKey varchar(32) not null references LinkRentalInventory(LinkRentalInventoryHashKey),
+create table dataVault.SatRentalInventory (
+	LinkRentalInventoryHashKey varchar(32) not null references dataVault.LinkRentalInventory(LinkRentalInventoryHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	
 	PRIMARY KEY (LinkRentalInventoryHashKey, LoadDate)
 );
 
-drop table if exists SatRentalDate;
-create table SatRentalDate (
-	HubRentalHashKey varchar(32) not null references HubRental(HubRentalHashKey),
+create table dataVault.SatRentalDate (
+	HubRentalHashKey varchar(32) not null references dataVault.HubRental(HubRentalHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	
 	RentalDate timestamp,
@@ -74,11 +68,10 @@ create table SatRentalDate (
 	PRIMARY KEY (HubRentalHashKey, LoadDate)
 );
 
-drop table if exists SatRentalReturnDate;
-create table SatRentalReturnDate (
-	HubRentalHashKey varchar(32) not null references HubRental(HubRentalHashKey),
+create table dataVault.SatRentalReturnDate (
+	HubRentalHashKey varchar(32) not null references dataVault.HubRental(HubRentalHashKey),
 	LoadDate timestamp not null,
-	LoadEndDate timestamp not null,
+	LoadEndDate timestamp,
 	RecordSource varchar(50) not null,
 	
 	RentalReturnDate timestamp,

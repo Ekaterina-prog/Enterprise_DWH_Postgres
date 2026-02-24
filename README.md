@@ -305,6 +305,41 @@ Technical implementation:
 14. Anchor Modeling
 Conceptual implementation of Anchor Modeling demonstrating anchors, attributes, ties and fully normalized (6NF) schema design with extensibility.
 
+15. Data Vault (Raw Vault Implementation)
+The final stage of the project introduces a Data Vault 2.0 Raw Vault layer as an additional enterprise architecture approach alongside Kimball and Inmon.
+
+Schema: dataVault
+
+Implemented Components
+Hubs:
+- HubFilm
+- HubInventory
+- HubRental
+
+Each hub stores:
+- Hash-based surrogate key (MD5 of business key)
+- Business identifier
+- LoadDate, RecordSource
+- Links
+- LinkFilmInventory
+- LinkRentalInventory
+ -Links use hash of concatenated business keys and implement insert-only loading.
+
+Satellites
+- Descriptive attributes separated from keys
+- Historical tracking via LoadDate / LoadEndDate
+- Change detection using HashDiff
+
+Key Architectural Takeaways
+- Hash-based surrogate keys eliminate sequence dependencies.
+- Insert-only logic ensures full historical reproducibility.
+- Raw Vault provides scalable and auditable enterprise storage.
+
+The project now demonstrates three DWH paradigms:
+- Kimball (Dimensional)
+- Inmon (3NF Enterprise)
+- Data Vault 2.0 (Historical Backbone)
+
 
 
 

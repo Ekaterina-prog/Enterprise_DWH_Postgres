@@ -1,23 +1,20 @@
 -- создаем хабы
 
-drop table if exists HubFilm;
-create table HubFilm (
+create table dataVault.HubFilm (
 	HubFilmHashKey varchar(32) primary key,
 	LoadDate timestamp not null,
 	RecordSource varchar(50) not null,
 	FilmID int not null
 );
 
-drop table if exists HubInventory;
-create table HubInventory (
+create table dataVault.HubInventory (
 	HubInventoryHashKey varchar(32) primary key,
 	LoadDate timestamp not null,
 	RecordSource varchar(50) not null,
 	InventoryID int not null
 );
 
-drop table if exists HubRental;
-create table HubRental (
+create table dataVault.HubRental (
 	HubRentalHashKey varchar(32) primary key,
 	LoadDate timestamp not null,
 	RecordSource varchar(50) not null,

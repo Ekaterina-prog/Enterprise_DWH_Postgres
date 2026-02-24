@@ -20,7 +20,12 @@ CREATE TABLE staging.film (
 	rating mpaa_rating NULL,
 	last_update timestamp NOT NULL,
 	special_features _text NULL,
-	fulltext tsvector NOT NULL
+	fulltext tsvector NOT null,
+	HubFilmHashKey varchar(32) not null,
+	FilmHashDiff varchar(32) not null,
+	FilmMonDiff varchar(32) not null,
+	LoadDate timestamp not null,
+	recordSource varchar(50) not null
 );
 
 drop table if exists staging.inventory;
@@ -29,7 +34,13 @@ CREATE TABLE staging.inventory (
 	film_id int2 NOT NULL,
 	store_id int2 NOT NULL,
 	last_update timestamp NOT NULL,
-	deleted timestamp NULL
+	deleted timestamp null,
+	HubInventoryHashKey varchar(32) not null,
+	HubFilmHashKey varchar(32) not null,
+	LinkFilmInventoryHashKey varchar(32) not null,
+	LinkRentalInventoryHashKey varchar(32),
+	LoadDate timestamp not null,
+	recordSource varchar(50) not null
 );
 
 drop table if exists staging.rental;
@@ -40,5 +51,11 @@ CREATE TABLE staging.rental (
 	return_date timestamp NULL,
 	staff_id int2 NOT NULL,
 	last_update timestamp NOT NULL,
-	deleted timestamp NULL
+	deleted timestamp null,
+	HubRentalHashKey varchar(32) not null,
+	HubInventoryHashKey varchar(32) not null,
+	HubStaffHashKey varchar(32) not null,
+	LinkRentalInventoryHashKey varchar(32) not null,
+	LoadDate timestamp not null,
+	recordSource varchar(50) not null
 );

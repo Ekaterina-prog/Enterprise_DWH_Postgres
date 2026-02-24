@@ -52,7 +52,12 @@ create or replace procedure staging.film_load(current_update_dt timestamp)
 			rating,
 			last_update,
 			special_features,
-			fulltext
+			fulltext,
+			HubFilmHashKey,
+			FilmHashDiff,
+			FilmMonDiff,
+			LoadDate,
+			recordSource
 		)
 		select 
 			film_id,
@@ -67,7 +72,22 @@ create or replace procedure staging.film_load(current_update_dt timestamp)
 			rating,
 			last_update,
 			special_features,
-			fulltext
+			fulltext,
+			upper(md5(upper(trim(coalesce(film_id::text, ''))))) as HubFilmHashKey,
+			upper(md5(upper(concat(
+		    trim(coalesce(title::text, '')), ';',
+		    trim(coalesce(description::text, '')), ';',
+			trim(coalesce(release_year::text, '')), ';',
+			trim(coalesce(length::text, '')), ';',
+			trim(coalesce(rating::text, ''))
+			)))) as FilmHashDiff,
+			upper(md5(upper(concat(
+		    trim(coalesce(rental_duration::text, '')), ';',
+		   	trim(coalesce(rental_rate::text, '')), ';',
+			trim(coalesce(replacement_cost::text, ''))
+			)))) as FilmMonDiff,
+			current_update_dt,
+			'DVDRentalDB'
 		from
 			film_src.film;
 		
@@ -86,14 +106,34 @@ as $$
 			film_id, 
 			store_id,
 			last_update,
-			deleted 
+			deleted,
+			HubInventoryHashKey,
+			HubFilmHashKey,
+			LinkFilmInventoryHashKey,
+			LinkRentalInventoryHashKey,
+			LoadDate,
+			recordSource
 		)
 		select 
 			inventory_id, 
 			film_id, 
 			store_id,
 			last_update,
-			deleted
+			deleted,
+			upper(md5(upper(trim(coalesce(inventory_id::text, ''))))) as HubInventoryHashKey,
+			upper(md5(upper(trim(coalesce(film_id::text, ''))))) as HubFilmHashKey,
+			upper(md5(upper(concat(
+		    trim(coalesce(film_id::text, '')),
+		    ';',
+		    trim(coalesce(inventory_id::text, ''))
+			)))) as LinkFilmInventoryHashKey,
+			upper(md5(upper(concat(
+			trim(coalesce(film_id::text, '')),
+			';',
+			trim(coalesce(inventory_id::text, ''))
+			)))) as LinkRentalInventoryHashKey,
+			current_update_dt,
+			'DVDRentalDB'
 		from
 			film_src.inventory i;
 		
@@ -118,7 +158,13 @@ as $$
 			return_date, 
 			staff_id,
 			last_update,
-			deleted
+			deleted,
+			HubRentalHashKey,
+			HubInventoryHashKey,
+			HubStaffHashKey,
+			LinkRentalInventoryHashKey,
+			LoadDate,
+			recordSource
 		)
 		select 
 			rental_id, 
@@ -127,7 +173,17 @@ as $$
 			return_date, 
 			staff_id,
 			last_update,
-			deleted
+			deleted,
+			upper(md5(upper(trim(coalesce(rental_id::text, ''))))) as HubRentalHashKey,
+			upper(md5(upper(trim(coalesce(inventory_id::text, ''))))) as HubInventoryHashKey,
+			upper(md5(upper(trim(coalesce(staff_id::text, ''))))) as HubStaffHashKey,
+	        upper(md5(upper(concat(
+		    trim(coalesce(rental_id::text, '')),
+		    ';',
+		    trim(coalesce(inventory_id::text, ''))
+			)))) as LinkRentalInventoryHashKey,
+   			current_update_dt,
+			'DVDRentalDB'
 		from
 			film_src.rental
 		where 
@@ -136,5 +192,4 @@ as $$
 		
 		call staging.set_table_load_time('staging.rental', current_update_dt);
 	end;
-
 $$ language plpgsql;
