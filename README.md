@@ -1,146 +1,76 @@
-Enterprise Data Warehouse Architecture (PostgreSQL)
+Comparison of DWH Architectures: Kimball, Inmon, Data Vault
 
-Overview
+Customer
 
-This project implements a comprehensive Enterprise Data Warehouse in PostgreSQL using three major architectural paradigms:
-- Kimball (Dimensional Modeling / Star Schema)
-- Inmon (Corporate Information Factory / 3NF)
-- Data Vault 2.0 (Raw Vault)
+Educational project (self-developed).
+The goal was not only to build data marts, but to practically compare three approaches to enterprise data warehouse design.
 
-The solution demonstrates practical implementation of different DWH approaches within a single unified system.
+Project Overview
 
-Architecture Layers
+Three DWH architectures were implemented in PostgreSQL:
+- Kimball — Star Schema
+- Inmon — 3NF + centralized warehouse + DDS
+- Data Vault 2.0 — Raw Vault (hubs, links, satellites)
 
-1. Source Layer
-- Source system: PostgreSQL (dvdrental)
-- Connected via postgres_fdw
-- No business transformations
-- Pure operational data reflection
+The same data source is organized in different ways to compare:
+- model flexibility
+- scalability
+- analytical usability
+- development and maintenance complexity
 
-2. Staging Layer
-Purpose:
-- Data ingestion
-- Incremental processing
-- Technical preparation for core layers
+Data Source
+Educational database dvdrental
+(movies, rentals, payments, customers)
 
-Implemented features:
-- Incremental load for transactional tables
-- Full load for small reference tables
-- Soft delete support (deleted flag)
-- Centralized load timestamp control
-- Unified orchestration via full_load()
+Tech Stack
+- PostgreSQL
+- SQL / PLpgSQL
+- DBeaver
+- FDW
+- Power BI
+- Git
 
-Value:
-- Prevents data desynchronization
-- Ensures consistent load execution
-- Enables scalable incremental processing
+Implemented Tasks
+Kimball
+- staging layer with incremental loading
+- fact tables (rental, payment)
+ -dimensions with SCD Type 2
+- sales data marts
+- BI dashboard
 
-3. Core Layer – Kimball (Star Schema)
+Inmon
+- layers: staging → ODS → REF → integration (3NF) → DDS
+- historization via hash control
+- data marts built on top of centralized warehouse
 
-Dimensional model implementation:
+Data Vault 2.0
+- Hubs (business keys)
+- Links (relationships)
+- Satellites (attributes + historization)
+- hash keys (MD5)
+- insert-only logic
 
-Dimensions
-- dim_inventory (SCD Type 2)
-- dim_date
-- dim_staff
+Key Findings
+Kimball – Fast, BI-friendly analytics, but rigid structure.
+Inmon – Centralized, no redundancy, but complex to build.
+Data Vault – Highly flexible and scalable, but requires strict discipline.
 
-Fact Tables
-- fact_rental
-- fact_payment
+Key Findings
+- Kimball – Fast, BI-friendly analytics, but rigid structure.
+- Inmon – Centralized, no redundancy, but complex to build.
+- Data Vault – Highly flexible and scalable, but requires strict discipline.
 
-Technical solutions:
-- SCD Type 2 for historical tracking
-- Incremental fact loading
-- Proper surrogate key management
-- Aggregated reporting marts
- 
-Value:
-- Historical accuracy of reporting
-- High-performance analytical queries
-- BI-ready data structure
+How to Run
+git clone https://github.com/Ekaterina-prog/Enterprise_DWH_Postgres.git
 
-4. Enterprise Layer – Inmon (3NF Architecture)
+Configure FDW connection and execute loading scripts inside the selected architecture folder.
 
-Implemented layers:
-- ODS (Operational Data Store)
-- Integration Layer (natural → surrogate key replacement)
-- DDS (historical detailed storage)
-
-Technical solutions:
-- Row-level change detection using md5(row::text)
-- Version closing on data change
-- Enterprise-level historical tracking
-
-Value:
-- Centralized corporate data model
-- Clean separation of operational and analytical structures
-- Strong support for enterprise reporting
-
-5. Data Vault 2.0 – Raw Vault
-
-Raw Vault implementation includes:
-
-Hubs
-- Hash-based surrogate keys (MD5 of business keys)
-- Business identifiers
-- LoadDate / RecordSource
-
-Links
-- Hash of concatenated business keys
-- Insert-only logic
-
-Satellites
-- Descriptive attributes
-- Historical tracking via LoadDate / LoadEndDate
-- HashDiff-based change detection
-
-Technical characteristics:
-- Insert-only architecture
-- Hash-based surrogate keys
-- Full historical reproducibility
-- Independent scaling of entities
-
-Value:
-- High scalability
-- Easy addition of new data sources
-- Full auditability
-- Flexible enterprise backbone
-
-Key Technical Implementations
-- Incremental loading strategy
-- SCD Type 2 versioning
-- Soft delete handling
-- Hash-based surrogate keys (MD5)
-- Insert-only Raw Vault logic
-- Centralized load timestamp control
-- Hybrid DWH architecture
-- Power BI integration for reporting
-
-Data Mart Layer
-- Aggregated reporting tables (sales_by_date, sales_by_film)
-- Pre-calculated metrics
-- Reduced load on transactional facts
-- BI optimization
-
-Architectural Value
-
-The implemented solution provides:
-- Historical consistency
-- Enterprise scalability
-- Flexible data model extension
-- Business-event auditability
-- Reproducible reporting snapshots
-- Reduced full reload dependency
-- Clear separation of modeling paradigms
-
-Summary
-
-This project demonstrates practical implementation and comparison of three major DWH paradigms:
-- Kimball – optimized analytical reporting
-- Inmon – enterprise 3NF integration
-- Data Vault 2.0 – scalable historical backbone
-
-The architecture is designed to ensure flexibility, scalability, and full historical traceability across all layers.
+Repository Structure
+01_Kimball/
+02_Inmon/
+03_Data_Vault/
+04_Anchor_Modeling/
+README.md
 
 
 
